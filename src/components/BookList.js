@@ -1,3 +1,4 @@
+import { Heading, Input } from '@chakra-ui/react';
 import React, { useEffect, useRef, useState } from 'react';
 
 const BookList = () => {
@@ -15,6 +16,7 @@ const BookList = () => {
                 method: "GET",
                 headers: {
                     Authorization : `KakaoAK ${process.env.REACT_APP_API_KEY}`,
+
                 },
             }
         );
@@ -29,21 +31,22 @@ const BookList = () => {
         setBookList(data.documents);
     }
 
-    useEffect(() => {
-        fetchBooks();
-    }, [page, search]);
-
     const changeSearch = e => {
         //내용 작성
-        if(e.target.value >= 2){
+        if(e.target.value.length >= 2){
             setSearch(e.target.value);
         }
     }
 
+    useEffect(() => {
+        fetchBooks();
+    }, [page, search]);
+
+
     return (
         <>
-            <h1>도서 검색 목록</h1>
-            <input type='text' placeholder='검색어 입력' onChange={changeSearch}></input>
+            <Heading>도서 검색 목록</Heading>
+            <Input type='text' placeholder='검색어입력' onChange={changeSearch} size="lg" variant="filled"></Input>
             <div>
                 {bookList.map(book => (
                     <>
