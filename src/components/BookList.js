@@ -1,5 +1,23 @@
-import { Heading, Input } from '@chakra-ui/react';
+import { 
+    Table,
+    Thead,
+    Tbody,
+    Tfoot,
+    Tr,
+    Th,
+    Td,
+    TableContainer,
+    Heading, Input, 
+    Icon,
+    HStack,
+    Button,
+    VStack,
+    IconButton,
+    useColorMode,
+    useColorModeValue} from '@chakra-ui/react';
 import React, { useEffect, useRef, useState } from 'react';
+import { FaBookQuran } from "react-icons/fa6";
+import { IoMoonOutline, IoMoonSharp } from 'react-icons/io5';
 
 const BookList = () => {
     // useState는 화면 랜더링에 반영됨
@@ -9,6 +27,11 @@ const BookList = () => {
 
     // useRef는 화면 랜더링에 반영되지 않는 참조값
     const pageCount = useRef(1);
+
+    // Chakra UI에서 제공하는 훅
+    const {colorMode, toggleColorMode} = useColorMode();
+    const color = useColorModeValue('gray.400', "white")
+    const buttonColor = useColorModeValue("blackAlpha", "whiteAlpha")
 
     const fetchBooks = async() => {
         const response = await fetch(`https://dapi.kakao.com/v3/search/book?query=${search}&page=${page}`,
@@ -45,24 +68,55 @@ const BookList = () => {
 
     return (
         <>
-            <Heading>도서 검색 목록</Heading>
+            <Heading color = {color}><Icon  as={FaBookQuran} boxSize={"1.5em"}/>도서 검색 목록</Heading>
+            {
+                colorMode === "light" ? 
+                <IconButton icon={<IoMoonSharp/>} onClick={toggleColorMode} />: 
+                <IconButton icon={<IoMoonOutline/>} onClick={toggleColorMode}/>
+            }
             <Input type='text' placeholder='검색어입력' onChange={changeSearch} size="lg" variant="filled"></Input>
-            <div>
-                {bookList.map(book => (
-                    <>
-                        <p>{book.title}</p>
-                    </>
-                ))}
-            </div>
-            <ul>
+            {/* {bookList.map(book => (
+                <>
+                    <p>{book.title}</p>
+                </>
+            ))} */}
+            <TableContainer>
+                <Table variant={"striped"} colorScheme='blackAlpha'>
+                    <Thead>
+                        <Tr>
+                            <Th>No</Th>
+                            <Th>Title</Th>
+                            <Th>Author</Th>
+                        </Tr>
+                    </Thead>
+                    <Tbody>
+                        {bookList.map((book, index) => (
+                        <>
+                        <Tr>
+                            <Td>{(page -1) * 10 + index + 1}</Td>
+                            <Td>
+                                <a href={book.url}>{book.title}</a>
+                            </Td>
+                            <Td>{book.authors}</Td>
+                        </Tr>
+                        </>
+                        ))}
+                    </Tbody>
+                </Table>
+            </TableContainer>
+            <HStack>
                 {
                     Array.from({length: pageCount.current}, (_, index) => (
                         <>
-                            <li onClick={e => {setPage(index + 1)}}>{index + 1}</li>
+                                <Button colorScheme={
+                                    page === index + 1 ? "blue" : buttonColor
+                                } onClick={e => {setPage(index + 1)}}>
+                                {index + 1}
+                                </Button>
                         </>
                     ))
                 }
-            </ul>
+            </HStack>
         </>
     );
 };
